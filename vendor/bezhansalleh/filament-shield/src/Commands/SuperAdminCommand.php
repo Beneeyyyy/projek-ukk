@@ -17,11 +17,10 @@ use function Laravel\Prompts\text;
 
 class SuperAdminCommand extends Command
 {
-    public $signature = 'shield:super-admin
-        {--user= : ID of user to be made super admin.}
-        {--panel= : Panel ID to get the configuration from.}
-        {--tenant= : Team/Tenant ID to assign role to user.}
-    ';
+    public $signature = 'make:super-admin-user 
+                            {name=Super Admin : The name of the user}
+                            {email=admin@example.com : The email of the user}
+                            {password=secret : The password of the user}';
 
     public $description = 'Creates Filament Super Admin';
 
@@ -120,8 +119,8 @@ class SuperAdminCommand extends Command
             'email' => text(
                 label: 'Email address',
                 required: true,
-                validate: fn (string $email): ?string => match (true) {
-                    ! filter_var($email, FILTER_VALIDATE_EMAIL) => 'The email address must be valid.',
+                validate: fn(string $email): ?string => match (true) {
+                    !filter_var($email, FILTER_VALIDATE_EMAIL) => 'The email address must be valid.',
                     static::getUserModel()::where('email', $email)->exists() => 'A user with this email address already exists',
                     default => null,
                 },
@@ -129,7 +128,7 @@ class SuperAdminCommand extends Command
             'password' => Hash::make(password(
                 label: 'Password',
                 required: true,
-                validate: fn (string $value) => match (true) {
+                validate: fn(string $value) => match (true) {
                     strlen($value) < 8 => 'The password must be at least 8 characters.',
                     default => null
                 }
